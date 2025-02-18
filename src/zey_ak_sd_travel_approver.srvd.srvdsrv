@@ -1,0 +1,15 @@
+@EndUserText.label: 'Travel processor service definition'
+define service ZEY_Ak_SD_TRAVEL_APPROVER {
+  expose ZEY_AK_TRAVEL_APPROVER        as Travel;
+  expose ZEY_AK_BOOKING_APPROVER       as Booking;
+  expose ZEY_AK_BOOKING_SUPPL_APPROVER as BookSuppl;
+  expose /DMO/I_Agency                 as Agency;
+  expose /DMO/I_Customer               as Customer;
+  expose /DMO/I_Carrier                as Carrier;
+  expose /DMO/I_Connection             as Connection;
+  expose /DMO/I_Supplement             as Supplement;
+  expose I_Currency                    as Currency;
+  expose I_Country                     as Country;
+  expose /DMO/I_Overall_Status_VH      as TravelStatus;
+  expose /DMO/I_Booking_Status_VH      as BookingStatus;
+}

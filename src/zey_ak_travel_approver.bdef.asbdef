@@ -1,0 +1,29 @@
+projection;
+strict ( 2 );
+use draft;
+define behavior for ZEY_Ak_TRAVEL_APPROVER alias Travel
+{
+ use update;
+ field (readonly)
+ AgencyId, CustomerId,
+ BeginDate, EndDate, TotalPrice,
+ OverallStatus;
+ use action acceptTravel;
+ use action rejectTravel;
+ use action Prepare;
+ use action Edit;
+ use action Resume;
+ use action Activate;
+ use action Discard;
+ use association _Booking;
+}
+define behavior for ZEY_Ak_BOOKING_APPROVER alias Booking
+{
+ use association _Travel;
+ use association _BookingSupplement;
+}
+define behavior for ZEY_Ak_BOOKING_SUPPL_APPROVER alias BookSuppl
+{
+ use association _Travel;
+ use association _Booking;
+}

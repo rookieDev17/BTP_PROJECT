@@ -1,0 +1,136 @@
+managed implementation in class zbp_ey_aK_travel unique;
+//indicate that we are running in strict mode - guideline
+strict ( 2 );
+//add draft feature at BO level
+with draft;
+//create BDEF for travel root entity with alias
+define behavior for ZEY_AK_TRAVEL alias Travel
+//Behavior pool for travel entity
+implementation in class zbp_ey_ak_travel unique
+//specify the database table where RAP will write our data
+persistent table /dmo/travel_m
+//indicate that travel entity will help to lock data records for child also
+lock master
+total etag LastChangedAt
+//spcify the security of my data - do later
+authorization master ( instance )
+//specify the draft table - will created by the rap framework
+draft table ZEY_AK_d_travel
+//timestamp for sync of data
+etag master LastChangedAt
+//Adding early numbering support to auto generate travel id
+early numbering
+with additional save
+{
+ ///Hey RAP can you please auto generate my code to C U D data in tabkle
+ create ( precheck );
+ update ( precheck );
+ delete;
+ field ( readonly ) TravelId;
+ field (mandatory) AgencyId, CustomerId, BeginDate, EndDate, OverallStatus, BookingFee, CurrencyCode;
+ //adding the draft actions
+ draft determine action Prepare;
+ draft action Edit;
+ draft action Resume;
+ draft action Activate;
+ draft action Discard;
+ //its a piece of code which is intented to be only
+ //consumed within our RAP BO
+ internal action reCalcTotalPrice;
+ //Checking custom business object rules
+ validation validateHeaderData on
+ save {create; field CustomerId, BeginDate, EndDate;}
+ //Adding side-effect which inform RAP to reaload the total price if the booking
+ //fee has been changed on the Frontend
+ side effects {
+   field BookingFee affects field TotalPrice;
+ }
+ //Define determination to execute the code when
+ //booking fee or curr code changes so we calc total price
+ determination calculateTotalPrice on modify
+           { create; field BookingFee, CurrencyCode; }
+ //data actions using factory action to create new instances of BO
+ factory action copyTravel[1];
+ //non factory actions which will change the state of the BO instance
+
+
+ action (features : instance) acceptTravel result[1] $self;
+ action (features : instance) rejectTravel result[1] $self;
+
+
+ association _Booking { create (features:instance); with draft; }
+ mapping for /dmo/travel_m{
+   TravelId = travel_id;
+   AgencyId = agency_id;
+   CustomerId = customer_id;
+   BeginDate = begin_date;
+   EndDate = end_date;
+   TotalPrice = total_price;
+   CurrencyCode = currency_code;
+   BookingFee = booking_fee;
+   LastChangedAt = last_changed_at;
+   LastChangedBy = last_changed_by;
+   CreatedAt = created_at;
+   CreatedBy = created_by;
+   OverallStatus = overall_status;
+   Description = description;
+ }
+}
+define behavior for ZEY_AK_BOOKING alias Booking
+implementation in class zbp_ey_aK_booking unique
+persistent table /dmo/booking_m
+//draft table for the booking
+draft table ZEY_AK_d_book
+lock dependent by _Travel
+authorization dependent by _Travel
+etag master LastChangedAt
+early numbering
+{
+ ///Hey RAP can you please auto generate my code to U D data in tabkle
+ update;
+ delete;
+ //while editing booking, we dont allow to change travel id
+ field ( readonly ) TravelId, BookingId;
+ field ( mandatory ) CarrierId, ConnectionId, FlightDate, BookingStatus;
+ association _Travel;
+ association _BookingSupplement { create; with draft; }
+ mapping for /dmo/booking_m{
+   TravelId = travel_id;
+   BookingId = booking_id;
+   BookingDate = booking_date;
+   CustomerId = customer_id;
+   CarrierId = carrier_id;
+   ConnectionId = connection_id;
+   FlightDate = flight_date;
+   FlightPrice = flight_price;
+   CurrencyCode = currency_code;
+   BookingStatus = booking_status;
+   LastChangedAt = last_changed_at;
+ }
+}
+define behavior for ZEY_AK_BOOKSUPPL alias BookSuppl
+implementation in class zbp_ey_aK_booksuppl unique
+persistent table /dmo/booksuppl_m
+//draft table for the booking
+draft table ZEY_AK_d_booksu
+lock dependent by _Travel
+authorization dependent by _Travel
+early numbering
+//etag master <field_name>
+{
+ update;
+ delete;
+ field ( readonly ) TravelId, BookingId;
+ field ( mandatory ) Price, SupplementId;
+ association _Travel;
+ association _Booking;
+ mapping for /dmo/booksuppl_m{
+   TravelId = travel_id;
+   BookingId = booking_id;
+   BookingSupplementId = booking_supplement_id;
+   SupplementId = supplement_id;
+   price = price;
+   CurrencyCode = currency_code;
+   LastChangedAt = last_changed_at;
+ }
+}

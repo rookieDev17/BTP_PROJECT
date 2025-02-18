@@ -1,0 +1,93 @@
+@Metadata.layer: #PARTNER
+@UI.headerInfo: {
+   typeName: 'Booking',
+   typeNamePlural: 'Bookings',
+   title: { value: 'BookingId' },
+   description: { value: 'BookingDate' }   
+}
+annotate entity ZEY_AK_BOOKING_APPROVER
+   with
+{
+   @UI.facet: [{
+       purpose: #STANDARD,
+       type: #COLLECTION,
+       id: 'popcat',
+       label: 'Booking Details',
+       position: 10
+    },
+    {
+       purpose: #STANDARD,
+       type: #LINEITEM_REFERENCE,
+       label: 'Supplements',
+       position: 20,
+       targetElement: '_BookingSupplement'
+    },{
+       purpose: #STANDARD,
+       type: #IDENTIFICATION_REFERENCE,
+       position: 10,
+       label: 'Booking info',
+       parentId: 'popcat',
+       targetQualifier: 'bookinfo'       
+    },{
+       purpose: #STANDARD,
+       type: #FIELDGROUP_REFERENCE,
+       position: 20,
+       label: 'Pricings',
+       parentId: 'popcat',
+       targetQualifier: 'priceinfo'       
+    }]
+   @UI.identification: [{ position: 10 }]
+   TravelId;
+   @UI.lineItem: [{ position: 10 }]
+   @UI.identification: [{ position: 20 }]
+   BookingId;
+   @UI.lineItem: [{ position: 20 }]
+   @UI.identification: [{ position: 30 }]
+   BookingDate;
+   @UI.lineItem: [{ position: 30 }]
+   @UI.fieldGroup: [{ position: 10, qualifier: 'priceinfo' }]
+   @Consumption.valueHelpDefinition: [{
+       entity: { name: '/DMO/I_Customer' , element: 'CustomerID'}
+    }]
+   CustomerId;
+   @UI.lineItem: [{ position: 40 }]
+   @UI.fieldGroup: [{ position: 20, qualifier: 'priceinfo' }]
+   @Consumption.valueHelpDefinition: [{
+       entity: { name: '/DMO/I_Carrier' , element: 'AirlineID'}
+    }]
+   CarrierId;
+   @UI.lineItem: [{ position: 50 }]
+   @UI.fieldGroup: [{ position: 30, qualifier: 'priceinfo' }]
+   @Consumption.valueHelpDefinition: [{
+       entity: { name: '/DMO/I_Connection' , element: 'ConnectionID'},
+       additionalBinding: [{
+           element: 'AirlineID', localElement: 'CarrierId'
+        }]
+    }]
+   ConnectionId;
+   @UI.lineItem: [{ position: 60 }]
+   @UI.fieldGroup: [{ position: 40, qualifier: 'priceinfo' }]
+   @Consumption.valueHelpDefinition: [{
+       entity: { name: '/DMO/I_Flight' , element: 'FlightDate'},
+       additionalBinding: [{
+           element: 'AirlineID', localElement: 'CarrierId'
+        },{
+           element: 'ConnectionID', localElement: 'ConnectionId'
+        }]
+    }]
+   FlightDate;
+   @UI.lineItem: [{ position: 70 }]
+   @UI.fieldGroup: [{ position: 50, qualifier: 'priceinfo' }]
+   FlightPrice;
+   @UI.lineItem: [{ position: 80 }]
+   @UI.fieldGroup: [{ position: 60, qualifier: 'priceinfo' }]
+   CurrencyCode;
+   @UI.fieldGroup: [{ position: 70, qualifier: 'priceinfo' }]
+   BookingStatus;
+   @UI.lineItem: [{ position: 80, importance: #HIGH }]
+   co2tax;
+   @UI.lineItem: [{ position: 90, importance: #HIGH }]
+   dayoftheflight;
+//    LastChangedAt;
+ 
+}
